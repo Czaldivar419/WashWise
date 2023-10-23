@@ -1,45 +1,19 @@
 import { useRouter } from 'next/router';
 import { ObjectId } from 'mongodb';
-import { useSession, getSession } from 'next-auth/react';
 import clientPromise from '/lib/mongodb';
 
-
-
-export default function SingleShop({ shop }) {
+export default function SingleOrder({ order }) {
   const router = useRouter();
-  const { data: session } = useSession();
-  if (session) {
 
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
-}
-
-    const handleOrderRequest = async () => { 
-      const session = await getSession();
-
-    if (!session) {
-      console.log('User is not authenticated. Session:', session);
-      return;
-    }
-
-    try {
-      const customerID = session.user.id;
-      console.log('Customer ID:', customerID);
-
-      // ... rest of your order creation logic ...
-
-      router.push('/orders/confirmation');
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <div>
-      <h1>{shop.name}</h1>
-      <h3>{shop.zipcode}</h3>
-      <button onClick={handleOrderRequest}>Request Order</button>
+      <h1>{order.name}</h1>
+      <h3>{order.zipcode}</h3>
+      <h3>{order.zipcode}</h3>
     </div>
   );
 }
@@ -65,4 +39,3 @@ export async function getStaticProps({ params }) {
     props: { shop: JSON.parse(JSON.stringify(shop)) },
   };
 }
-

@@ -5,20 +5,14 @@ async function addShop (req, res) {
       const client = await clientPromise;
       const db = client.db("WashwiseMain");
       const { 
-        name,
-        bio,
-        address,
-        images,
-        laundryServices,
-        availableBrands, } = req.body;
+        typeOfWash,
+        orderDate,
+        additionalNotes, } = req.body;
   
-      const post = await db.collection("shops").insertOne({
-          name,
-          bio,
-          address,
-          images,
-          laundryServices,
-          availableBrands,
+      const post = await db.collection("orders").insertOne({
+        typeOfWash,
+        orderDate,
+        additionalNotes,
       });
   
       res.json(post);
