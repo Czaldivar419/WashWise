@@ -1,5 +1,7 @@
 import Dash from "@/components/dashboard"
+import ActiveOrders from "@/components/orders/activeOrders";
 import Navbar from "@/components/nav";
+import PastOrders from "@/components/orders/pastOrders";
 import { useSession } from 'next-auth/react';
 
 
@@ -10,8 +12,10 @@ export default function Dashboard() {
         console.log('user name:', session.user.name)
     }
     return (
-        <div className="bg-blue-300 h-full w-full">
+        <div className="bg-blue-300 min-h-screen min-w-screen">
             <Dash />
+            <ActiveOrders />
+            <PastOrders />
             <Navbar />
         </div>
     )

@@ -1,48 +1,27 @@
-import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+import { useState } from 'react';
+import ShopProfile from '@/components/shop/shopProfile';
+import OrderForm from '@/components/orders/orderForm';
+import clientPromise from '../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
-import { useSession, getSession } from 'next-auth/react';
-import clientPromise from '/lib/mongodb';
-
-
+import Navbar from '@/components/nav';
 
 export default function SingleShop({ shop }) {
-  const router = useRouter();
   const { data: session } = useSession();
-  if (session) {
+  const [showOrderForm, setShowOrderForm] = useState(false);
 
-  if (router.isFallback) {
-    return <div>Loading...</div>;
-  }
-}
-
-    const handleOrderRequest = async () => { 
-      const session = await getSession();
-
-    if (!session) {
-      console.log('User is not authenticated. Session:', session);
-      return;
-    }
-
-    try {
-      const customerID = session.user.id;
-      console.log('Customer ID:', customerID);
-
-      // ... rest of your order creation logic ...
-
-      router.push('/orders/confirmation');
-    } catch (error) {
-      console.error(error);
-    }
+  const handleOrderRequest = () => {
+    setShowOrderForm(true);
   };
 
   return (
-    <div>
-      <h1>{shop.name}</h1>
-      <h3>{shop.zipcode}</h3>
-      <button onClick={handleOrderRequest}>Request Order</button>
+    <div className='bg-blue-300 min-h-screen min-w-screen'>
+      <ShopProfile shop={shop} />
+      <Navbar />
     </div>
   );
 }
+
 
 export async function getStaticPaths() {
   const client = await clientPromise;
@@ -57,12 +36,19 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const client = await clientPromise;
-  const db = client.db('WashwiseMain');
-  const shop = await db.collection('shops').findOne({ _id: new ObjectId(params.id) });
+  try {
+    const client = await clientPromise;
+    const db = client.db('WashwiseMain');
+    const shop = await db.collection('shops').findOne({ _id: new ObjectId(params.id) });
 
-  return {
-    props: { shop: JSON.parse(JSON.stringify(shop)) },
-  };
+    return {
+      props: { shop: shop ? JSON.parse(JSON.stringify(shop)) : null },
+    };
+  } catch (error) {
+    console.error('Error fetching shop data:', error);
+    return {
+      props: { shop: null },
+    };
+  }
 }
 

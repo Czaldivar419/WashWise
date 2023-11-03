@@ -26,6 +26,8 @@ export default function Home() {
   }
 
   return (
-    <div className="text-6xl">Signed In</div>
+    <div className="bg-blue-300 min-h-screen min-w-screen">
+    <div className="text-6xl text-white">Welcome to Washwise</div>
+    </div>
   );
 }

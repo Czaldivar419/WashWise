@@ -1,87 +1,77 @@
 import { useState } from 'react';
+import { getSession } from 'next-auth/react';
 
-const OrderForm = () => {
-  // Define the state variables to store order information
-  const [typeOfWash, setTypeOfWash] = useState('');
-  const [orderDate, setOrderDate] = useState('');
-  const [additionalNotes, setAdditionalNotes] = useState('');
+export default function OrderForm({ shop }) {
+  const [showModal, setShowModal] = useState(true);
+  const [name, setName] = useState(''); // Initialize the 'name' state
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    const session = await getSession(); // Get the user's session
+
+    if (!session) {
+      console.error('User not authenticated');
+      return;
+    }
+
     try {
       const response = await fetch('/api/orders/new', {
         method: 'POST',
         body: JSON.stringify({
-          typeOfWash,
-          orderDate,
-          additionalNotes,
+          userId: session.user.id,
+          name,
         }),
         headers: {
           'Content-Type': 'application/json',
         },
       });
+
       if (response.ok) {
-        // Order created successfully, handle success here.
-        console.log('Order created successfully');
+        // Shop created successfully, handle success here.
+        console.log('Wash requested successfully');
       } else {
         // Handle errors if necessary.
-        console.error('Order creation failed');
+        console.error('Wash request failed');
       }
     } catch (error) {
       // Handle network or other errors.
       console.error('An error occurred:', error);
     }
-
-    // Create an order object with the information
-    const newOrder = {
-      typeOfWash,
-      orderDate,
-      additionalNotes,
-    };
-
-    // Testing
-    console.log('New Order:', newOrder);
-
-    // Clear the form fields after submission
-    setTypeOfWash('');
-    setOrderDate('');
-    setAdditionalNotes('');
   };
 
   return (
-    <div className='bg-blue-300'>
-      <h2>Place an Order</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Type of Wash:</label>
-          <input
-            type="text"
-            value={typeOfWash}
-            onChange={(e) => setTypeOfWash(e.target.value)}
-          />
+    <div>
+      {showModal && (
+        <div className="modal">
+          <div className="modal-whole bg-gray-300 position-fixed fixed inset-8 justify-center opacity-95">
+            <div id="modal-header" className='text-center text-3xl p-4'>
+              <h2>Request a Wash</h2>
+            </div>
+            <div className=' p-4' id="modal-body">
+              <form onSubmit={handleFormSubmit}>
+                <label htmlFor="name">Name:</label>
+                <input
+                  className='m-2 rounded'
+                  type="text"
+                  placeholder="Shop Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <button type="submit">Submit</button>
+              </form>
+            </div>
+            <button onClick={closeModal} className="m-2 rounded bg-red-500 text-white p-2">
+              Close
+            </button>
+          </div>
         </div>
-        <div>
-          <label>Order Date and Time:</label>
-          <input
-            type="datetime-local"
-            value={orderDate}
-            onChange={(e) => setOrderDate(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Additional Notes:</label>
-          <textarea
-            value={additionalNotes}
-            onChange={(e) => setAdditionalNotes(e.target.value)}
-          />
-        </div>
-        <div>
-          <button type="submit">Create Order</button>
-        </div>
-      </form>
+      )}
     </div>
   );
-};
+}
 
-export default OrderForm;

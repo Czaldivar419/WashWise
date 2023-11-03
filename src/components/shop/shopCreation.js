@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getSession } from 'next-auth/react';
 
 export default function ShopCreation() {
   const [name, setName] = useState('');
@@ -8,8 +9,17 @@ export default function ShopCreation() {
   const [laundryServices, setLaundryServices] = useState('');
   const [availableBrands, setAvailableBrands] = useState('');
 
+  
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    const session = await getSession(); // Get the user's session
+
+    if (!session) {
+      console.error('User not authenticated');
+      return;
+    } 
     try {
       const response = await fetch('/api/shopAPI/addShop', {
         method: 'POST',
@@ -20,6 +30,7 @@ export default function ShopCreation() {
           images,
           laundryServices,
           availableBrands,
+          ownerId: session.user.id,
         }),
         headers: {
           'Content-Type': 'application/json',

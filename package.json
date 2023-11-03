@@ -24,6 +24,7 @@
     "next-auth": "^4.23.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-modal": "^3.16.1",
     "react-sortablejs": "^6.1.4",
     "sortablejs": "^1.15.0"
   },
