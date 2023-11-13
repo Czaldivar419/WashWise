@@ -5,9 +5,10 @@ export default function ShopCreation() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [address, setAddress] = useState('');
-  const [images, setImages] = useState('');
+  const [images, setImages] = useState([]);
   const [laundryServices, setLaundryServices] = useState('');
-  const [availableBrands, setAvailableBrands] = useState('');
+  const [availableBrands, setAvailableBrands] = useState(''); 
+  const [isUploading,setIsUploading] = useState(false);
 
   
 
@@ -49,6 +50,41 @@ export default function ShopCreation() {
     }
   };
 
+  async function uploadImages(ev) {
+    const files = ev.target?.files;
+  
+    if (files?.length > 0) {
+      setIsUploading(true);
+      const data = new FormData();
+  
+      for (const file of files) {
+        data.append('file', file);
+      }
+  
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: data,
+        });
+  
+        if (response.ok) {
+          const res = await response.json();
+          console.log(res);
+          setImages(oldImages => [...oldImages, res.links]); // Use S3 URL
+          setIsUploading(false);
+        } else {
+          // Handle errors if necessary.
+          console.error('Image upload failed');
+          setIsUploading(false); // Set loading state to false on error
+        }
+      } catch (error) {
+        // Handle network or other errors.
+        console.error('An error occurred:', error);
+        setIsUploading(false); // Set loading state to false on error
+      }
+    }
+  }
+
 
 
   return (
@@ -78,27 +114,29 @@ export default function ShopCreation() {
 
   {/* ------------------------------------------------------------------------------photo upload section--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
       
-      <div id="images">
+  <div id="images">
+        {images.map((imageUrl, index) => (
+          <img 
+          key={index} 
+          src={imageUrl} 
+          alt={`Image ${index}`} 
+          className="m-2 rounded h-24" />
+        ))}
+        {isUploading && <p>Loading...</p>}
         <div>
           <div id="profilepic">
-            <label
-            className='w-24 h-24 text-center flex items-center justify-center text-sm gap-1 text-gray-500 rounded-lg bg-gray-200'>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3V15" />
-            </svg>
+            <label className="w-24 h-24 cursor-pointer text-center flex flex-col items-center justify-center text-sm gap-1 text-primary rounded-sm bg-white shadow-sm border border-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
               <div>
-                Upload
+                Add image
               </div>
-              <input
-                className='m-2 rounded hidden'
-                type="file"
-                value={images}
-                onChange={(e) => setImages(e.target.value)}
-              />
+              <input type="file" onChange={uploadImages} className="hidden" />
             </label>
           </div>
         </div>
-    </div>
+      </div>
 
 {/* --------------------------------------------------------------------------checkbox section below --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
 <div id='checkboxes'>
@@ -107,7 +145,7 @@ export default function ShopCreation() {
         <input
           className='m-2 rounded'
           type="checkbox"
-          value="Wash and Fold"
+          value="Normal"
           onChange={(e) => {
             if (e.target.checked) {
               setLaundryServices([...laundryServices, e.target.value]);
@@ -122,7 +160,7 @@ export default function ShopCreation() {
         <input
           className='m-2 rounded'
           type="checkbox"
-          value="Dry Cleaning"
+          value="Heavy Duty "
           onChange={(e) => {
             if (e.target.checked) {
               setLaundryServices([...laundryServices, e.target.value]);
@@ -137,7 +175,7 @@ export default function ShopCreation() {
         <input
           className='m-2 rounded'
           type="checkbox"
-          value="Dry Cleaning"
+          value="Delicates"
           onChange={(e) => {
             if (e.target.checked) {
               setLaundryServices([...laundryServices, e.target.value]);
@@ -152,7 +190,7 @@ export default function ShopCreation() {
         <input
           className='m-2 rounded'
           type="checkbox"
-          value="Dry Cleaning"
+          value="Bulky"
           onChange={(e) => {
             if (e.target.checked) {
               setLaundryServices([...laundryServices, e.target.value]);
@@ -167,7 +205,7 @@ export default function ShopCreation() {
         <input
           className='m-2 rounded'
           type="checkbox"
-          value="Dry Cleaning"
+          value="Whites"
           onChange={(e) => {
             if (e.target.checked) {
               setLaundryServices([...laundryServices, e.target.value]);
@@ -182,7 +220,7 @@ export default function ShopCreation() {
         <input
           className='m-2 rounded'
           type="checkbox"
-          value="Dry Cleaning"
+          value="Dry Clean"
           onChange={(e) => {
             if (e.target.checked) {
               setLaundryServices([...laundryServices, e.target.value]);
@@ -191,13 +229,13 @@ export default function ShopCreation() {
             }
           }}
         />
-        Permanent Press
+        Dry Clean
       </label>
       <label>
         <input
           className='m-2 rounded'
           type="checkbox"
-          value="Dry Cleaning"
+          value="Express"
           onChange={(e) => {
             if (e.target.checked) {
               setLaundryServices([...laundryServices, e.target.value]);

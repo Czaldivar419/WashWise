@@ -1,7 +1,20 @@
+import { useState } from "react";
+
 import ProfileButton from "../profileButton";
-import CreateOrderButton from "../orders/createOrderButton";
+import OrderFormModal from "../orders/orderFormModal";
 
 export default function ShopProfile({ shop }) {
+    const [ isModalOpen, setModalOpen ] = useState(false);
+    console.log(shop.images)
+
+    const openModal = () => {
+        setModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalOpen(false);
+    };
+
     return (
 
 <div className="max-w-2xl mx-auto">
@@ -10,7 +23,11 @@ export default function ShopProfile({ shop }) {
     <div className="px-3 py-2">
       
         <div className="flex flex-col gap-1 text-center">
-            <a className="block mx-auto bg-center bg-no-repeat bg-white w-40 h-40 rounded-full border border-gray-400 shadow-lg" href={shop.images}></a>
+        <img
+            src={shop.images.length > 0 ? shop.images[0] : '/public/default.svg'}
+            alt="Profile"
+            className="rounded-full h-40 w-40 mx-auto mb-2"
+          />
             <p className="font-serif font-semibold">{shop.name}</p>
             <span className="text-sm text-gray-400">{shop.address}</span>
             <span className="text-sm text-gray-400">{shop.bio}</span>
@@ -32,9 +49,18 @@ export default function ShopProfile({ shop }) {
 
  
         <div className="flex justify-center gap-2 my-5">
-            <button className="bg-pink-500 px-4 py-2 rounded-full text-white shadow-lg">Follow</button>
-            <button className="bg-white border border-gray-500 px-4 py-2 rounded-full shadow-lg">Message</button>
-            <CreateOrderButton shop={shop} />
+          <button className="bg-pink-500 px-4 py-2 rounded-full text-white shadow-lg">
+            Follow
+          </button>
+          <button className="bg-white border border-gray-500 px-4 py-2 rounded-full shadow-lg">
+            Message
+          </button>
+          <button
+            className="bg-blue-500 px-4 py-2 rounded-full text-white shadow-lg"
+            onClick={openModal}
+          >
+            Create Order
+          </button>
         </div>
         
 
@@ -53,6 +79,8 @@ export default function ShopProfile({ shop }) {
             </button>
         </div>
     </div>
+    <OrderFormModal isOpen={isModalOpen} onClose={closeModal} />
+
 </div>
 
     );

@@ -1,14 +1,11 @@
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
 import ShopProfile from '@/components/shop/shopProfile';
-import OrderForm from '@/components/orders/orderForm';
 import clientPromise from '../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
 import Navbar from '@/components/nav';
 
 export default function SingleShop({ shop }) {
   const { data: session } = useSession();
-  const [showOrderForm, setShowOrderForm] = useState(false);
 
   const handleOrderRequest = () => {
     setShowOrderForm(true);

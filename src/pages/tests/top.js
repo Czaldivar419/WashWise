@@ -1,45 +1,19 @@
-import clientPromise from "/lib/mongodb";
-import Link from "next/link";
+import { useDataFetching } from './random';
 
-export default function Top({ movies }) {
+export default function ChildComponent() {
+  const data = useDataFetching('/api/shopAPI/getShops');
+
+  // Check if data exists before rendering
+  if (!data) {
+    return null; // or loading indicator
+  }
+
   return (
     <div>
-      <h1>Top 1000 Movies of All Time</h1>
-      <p>
-        <small>(According to Metacritic)</small>
-      </p>
-      <ul>
-        {movies.map((movie) => (
-          <li key={movie._id}>
-            <Link href="/tests/[id]" as={`/tests/${movie._id}`}>
-                <h2>{movie.title}</h2>
-            </Link>
-            <h3>{movie.metacritic}</h3>
-            <p>{movie.plot}</p>
-          </li>
-        ))}
-      </ul>
+      <h2>Name: {data.name}</h2>
+      <p>Bio: {data.bio}</p>
+      <p>Address: {data.address}</p>
+      {/* Render other properties as needed */}
     </div>
   );
 }
-
-export async function getServerSideProps() {
-    try {
-        const client = await clientPromise;
-        const db = client.db("sample_mflix");
-
-        const movies = await db
-            .collection("movies")
-            .find({})
-            .sort({ metacritic: -1 })
-            .limit(20)
-            .toArray();
-
-        return {
-            props: { movies: JSON.parse(JSON.stringify(movies)) },
-        };
-    } catch (e) {
-        console.error(e);
-    }
-}
-        

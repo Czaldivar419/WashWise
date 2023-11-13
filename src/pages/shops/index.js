@@ -14,7 +14,7 @@ export default function Shops({ shops }) {
 
   return (
     <div className="bg-blue-300 min-h-screen min-w-screen">
-      <h1 className="text-center text-4xl mb-4">Shops Near You</h1>
+      <h1 className="text-center text-4xl p-4">Shops Near You</h1>
       <button 
       className="text-white rounded bg-gray-500 px-2 mb-2 ml-2"
       onClick={newShopRedirect}>+Create a Shop</button>
@@ -45,6 +45,8 @@ export default function Shops({ shops }) {
         ))}
       </ul>
       <Navbar />
+      <div className="h-20">
+      </div>
     </div>
   );
 }

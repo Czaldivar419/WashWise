@@ -5,13 +5,23 @@ async function createOrder(req, res) {
     const client = await clientPromise;
     const db = client.db("WashwiseMain");
     const { 
-      userId,
-      name
-       } = req.body; // Add 'userId' to the request body
+      price,
+      orderStatus,
+      timeOfOrder,
+      typeOfWash,
+      typeOfDetergents,
+      customerId,
+      shopId
+       } = req.body; 
 
     const order = await db.collection("orders").insertOne({
-      userId,
-      name,  // Link the order to the customer's ID
+      price,
+      orderStatus,
+      timeOfOrder,
+      typeOfWash,
+      typeOfDetergents,
+      customerId,
+      shopId 
     });
 
     res.json(order);

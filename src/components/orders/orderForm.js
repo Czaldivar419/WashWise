@@ -1,30 +1,59 @@
 import { useState } from 'react';
+import { useURL } from '../utils/urlFinder';
 import { getSession } from 'next-auth/react';
+import { useEffect } from 'react';
 
-export default function OrderForm({ shop }) {
-  const [showModal, setShowModal] = useState(true);
-  const [name, setName] = useState(''); // Initialize the 'name' state
+export default function OrderForm({ onCreateOrder }) {
+  const [formData, setFormData] = useState({
+    price: '',
+    timeOfOrder: '',
+    typeOfWash: '',
+    typeOfDetergents: '',
+  });
 
-  const closeModal = () => {
-    setShowModal(false);
+  //---------------------------Form submission data ^---------------------------------------------------------------------------------------------------------------------------//
+
+
+  const {query} = useURL(); //retrieves shopID
+  console.log(query);
+
+  const [ shopData, setShopData ] = useState({});
+  const [ laundryServices, setLaundryServices ] = useState([]);
+  const [ availableBrands, setAvailableBrands ] = useState([]);
+
+//----------------------------ShopData Retrieval ^---------------------------------------------------------------------------------------------------------------------------//
+
+  const handleChange = (e) => {
+  const { name, value } = e.target;
+
+    if (name === "timeOfOrder") {
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const session = await getSession(); // Get the user's session
+    const session = await getSession();
 
     if (!session) {
       console.error('User not authenticated');
       return;
     }
 
+    const timestamp = new Date().toISOString(); 
+
     try {
       const response = await fetch('/api/orders/new', {
         method: 'POST',
         body: JSON.stringify({
-          userId: session.user.id,
-          name,
+          ...formData,
+          customerId: session.user.id,
+          shopId: query,
+          timeOfOrder: timestamp,
+          orderStatus: "Active",
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -32,46 +61,90 @@ export default function OrderForm({ shop }) {
       });
 
       if (response.ok) {
-        // Shop created successfully, handle success here.
-        console.log('Wash requested successfully');
+        // Order created successfully, handle success here.
+        console.log('Order created successfully');
+        // You can optionally pass the created order data to a callback
       } else {
         // Handle errors if necessary.
-        console.error('Wash request failed');
+        console.error('Order creation failed');
       }
     } catch (error) {
       // Handle network or other errors.
       console.error('An error occurred:', error);
     }
   };
+//-------------------------------------------Order Submission Post Request ^------------------------------------------------------------------------------------------------//
+useEffect(() => {
+    if (query) {
+      // Fetch shop data based on the shop ID (query)
+      // Update washOptions and detergentOptions accordingly
+      const fetchShopData = async () => {
+        try {
+          const response = await fetch(`/api/shopAPI/getShop/${query}`);
+          if (response.ok) {
+            const shop = await response.json();
+            setShopData(shop);
+            setLaundryServices(shop.laundryServices || []);
+            setAvailableBrands(shop.availableBrands || []);
+          }
+        } catch (error) {
+          console.error('Error fetching shop data:', error);
+        }
+      };
+
+      fetchShopData();
+    }
+  }, [query]);
+
+  
 
   return (
-    <div>
-      {showModal && (
-        <div className="modal">
-          <div className="modal-whole bg-gray-300 position-fixed fixed inset-8 justify-center opacity-95">
-            <div id="modal-header" className='text-center text-3xl p-4'>
-              <h2>Request a Wash</h2>
-            </div>
-            <div className=' p-4' id="modal-body">
-              <form onSubmit={handleFormSubmit}>
-                <label htmlFor="name">Name:</label>
-                <input
-                  className='m-2 rounded'
-                  type="text"
-                  placeholder="Shop Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                <button type="submit">Submit</button>
-              </form>
-            </div>
-            <button onClick={closeModal} className="m-2 rounded bg-red-500 text-white p-2">
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="price">Price:</label>
+        <input
+          type="text"
+          id="price"
+          name="price"
+          value={formData.price}
+          onChange={handleChange}
+        />
+      </div>
+      <div>
+      <label htmlFor="typeOfWash">Type of Wash:</label>
+      <select
+        id="typeOfWash"
+        name="typeOfWash"
+        value={formData.typeOfWash}
+        onChange={handleChange}
+      >
+        <option value="">Select a wash type</option>
+        {laundryServices.map((service) => (
+          <option key={service} value={service}>
+            {service}
+          </option>
+        ))}
+      </select>
     </div>
+      <div>
+      <label htmlFor="typeOfDetergents">Type of Detergents:</label>
+      <select
+        id="typeOfDetergents"
+        name="typeOfDetergents"
+        value={formData.typeOfDetergents}
+        onChange={handleChange}
+      >
+        <option value="">Select a detergent</option>
+        {availableBrands.map((brand) => (
+          <option key={brand} value={brand}>
+            {brand}
+          </option>
+        ))}
+      </select>
+    </div>
+      <button type="submit" className="bg-blue-300 px-2 rounded">
+        Create Order
+      </button>
+    </form>
   );
 }
-
