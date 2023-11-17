@@ -1,11 +1,10 @@
-import { useState } from 'react';
 import { useURL } from '../utils/urlFinder';
 import { getSession } from 'next-auth/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function OrderForm({ onCreateOrder }) {
   const [formData, setFormData] = useState({
-    price: '',
     timeOfOrder: '',
     typeOfWash: '',
     typeOfDetergents: '',
@@ -20,6 +19,8 @@ export default function OrderForm({ onCreateOrder }) {
   const [ shopData, setShopData ] = useState({});
   const [ laundryServices, setLaundryServices ] = useState([]);
   const [ availableBrands, setAvailableBrands ] = useState([]);
+
+  const router = useRouter();
 
 //----------------------------ShopData Retrieval ^---------------------------------------------------------------------------------------------------------------------------//
 
@@ -64,6 +65,7 @@ export default function OrderForm({ onCreateOrder }) {
         // Order created successfully, handle success here.
         console.log('Order created successfully');
         // You can optionally pass the created order data to a callback
+        router.push("/confirmation/order");
       } else {
         // Handle errors if necessary.
         console.error('Order creation failed');
@@ -100,16 +102,6 @@ useEffect(() => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="price">Price:</label>
-        <input
-          type="text"
-          id="price"
-          name="price"
-          value={formData.price}
-          onChange={handleChange}
-        />
-      </div>
       <div>
       <label htmlFor="typeOfWash">Type of Wash:</label>
       <select

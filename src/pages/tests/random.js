@@ -1,12 +1,12 @@
-export default function RandomPage() {
+import Bubbles from "@/components/utils/bubbles";
 
+import React from 'react'
 
-
-  return(
-    <div className="bg-pink-300 min-h-screen min-w-screen text-center text-5xl text-white">
-      <button className="bg-white text-pink-300 p-4 rounded">
-        Click Me
-      </button>
+export default function TestPage() {
+  return (
+    <div>
+        <Bubbles />
+      
     </div>
   )
- }
+}

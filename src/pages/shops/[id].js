@@ -2,18 +2,31 @@ import { useSession } from 'next-auth/react';
 import ShopProfile from '@/components/shop/shopProfile';
 import clientPromise from '../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
-import Navbar from '@/components/nav';
+import Bubbles from '@/components/utils/bubbles';
+import Header from '@/components/utils/header';
+import Navbar from '@/components/utils/nav';
+import ShopReviews from '../../components/reviews/shopReviews';
 
 export default function SingleShop({ shop }) {
   const { data: session } = useSession();
+  console.log(session);
 
   const handleOrderRequest = () => {
     setShowOrderForm(true);
   };
 
+  if (!session) {
+    // Session is not available yet, you can render a loading state or return null
+    return <div>Loading...</div>;
+  }
+
+
   return (
-    <div className='bg-blue-300 min-h-screen min-w-screen'>
+    <div>
+      <Bubbles />
+      <Header goBackPath="/shops" profilePath={`/profile/${session.user.id}`}/>
       <ShopProfile shop={shop} />
+      <ShopReviews />
       <Navbar />
     </div>
   );

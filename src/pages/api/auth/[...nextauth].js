@@ -4,7 +4,9 @@ import GoogleProvider from 'next-auth/providers/google'
 import clientPromise from '../../../../lib/mongodb'
 
 export default NextAuth({
-  adapter: MongoDBAdapter(clientPromise),
+  adapter: MongoDBAdapter(clientPromise, {
+    databaseName: 'WashwiseMain',
+  }),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_ID,
@@ -25,6 +27,7 @@ export default NextAuth({
     session(session, token) {
       if (token) {
         session.user = token.user;
+        session.maxAge= 30 * 60
       }
       return session;
     },

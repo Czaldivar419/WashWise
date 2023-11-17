@@ -1,14 +1,20 @@
 import { useState } from 'react';
 import { getSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+
+const maxImages = 1;
 
 export default function ShopCreation() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [address, setAddress] = useState('');
+  const [price, setPrice] = useState('');
   const [images, setImages] = useState([]);
   const [laundryServices, setLaundryServices] = useState('');
   const [availableBrands, setAvailableBrands] = useState(''); 
   const [isUploading,setIsUploading] = useState(false);
+
+  const router = useRouter();
 
   
 
@@ -31,6 +37,7 @@ export default function ShopCreation() {
           images,
           laundryServices,
           availableBrands,
+          price,
           ownerId: session.user.id,
         }),
         headers: {
@@ -40,6 +47,7 @@ export default function ShopCreation() {
       if (response.ok) {
         // Shop created successfully, handle success here.
         console.log('Shop created successfully');
+        router.push('/confirmation/shop');
       } else {
         // Handle errors if necessary.
         console.error('Shop creation failed');
@@ -53,7 +61,7 @@ export default function ShopCreation() {
   async function uploadImages(ev) {
     const files = ev.target?.files;
   
-    if (files?.length > 0) {
+    if (files?.length > 0 && images.length < maxImages) {
       setIsUploading(true);
       const data = new FormData();
   
@@ -82,61 +90,80 @@ export default function ShopCreation() {
         console.error('An error occurred:', error);
         setIsUploading(false); // Set loading state to false on error
       }
+    } else {
+      // Alert the user when attempting to upload more than the allowed number of images
+      alert(`You can only upload ${maxImages} image.`);
     }
   }
+
+  const removeImage = (index) => {
+    setImages((oldImages) => oldImages.filter((_, i) => i !== index));
+  };
 
 
 
   return (
     <form className="flex flex-col m-4"
     onSubmit={handleFormSubmit}>
+      <label className='text-lg'>Shop Name</label>
       <input
         className='m-2 rounded'
         type="text"
-        placeholder="Shop Name"
+        placeholder="Alayna's Shop"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
+      <label className='text-lg'>Bio</label>
       <input
         className='m-2 rounded'
         type="textarea"
-        placeholder="Bio"
+        placeholder="Fresh and Fast"
         value={bio}
         onChange={(e) => setBio(e.target.value)}
       />
+      <label className='text-lg'>Address</label>
       <input
         className='m-2 rounded'
         type="text"
-        placeholder="Address"
+        placeholder="1234 Main St. NY, NY"
         value={address}
         onChange={(e) => setAddress(e.target.value)}
       />
 
   {/* ------------------------------------------------------------------------------photo upload section--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
-      
-  <div id="images">
-        {images.map((imageUrl, index) => (
-          <img 
-          key={index} 
-          src={imageUrl} 
-          alt={`Image ${index}`} 
-          className="m-2 rounded h-24" />
-        ))}
-        {isUploading && <p>Loading...</p>}
-        <div>
-          <div id="profilepic">
-            <label className="w-24 h-24 cursor-pointer text-center flex flex-col items-center justify-center text-sm gap-1 text-primary rounded-sm bg-white shadow-sm border border-primary">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-              </svg>
-              <div>
-                Add image
-              </div>
-              <input type="file" onChange={uploadImages} className="hidden" />
-            </label>
-          </div>
-        </div>
+<div id="images" className=''>
+<h1 className='text-2xl mt-2'>Profile Picture</h1>
+  <div className="flex items-start">
+  <div className="">
+    <div id="profilepic" className="m-2">
+      <label className="w-24 h-24 cursor-pointer text-center flex flex-col items-center justify-center text-sm gap-1 text-primary rounded-sm bg-white shadow-sm border border-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+        </svg>
+        <div>Add image</div>
+        <input type="file" onChange={uploadImages} className="hidden" />
+      </label>
+    </div>
+  </div>
+  <div className="w-1/2 flex flex-wrap">
+    {images.map((imageUrl, index) => (
+      <div key={index} className="relative m-2">
+        <img src={imageUrl} alt={`Image ${index}`} className="rounded h-24" />
+        <button
+          onClick={() => removeImage(index)}
+          className="absolute top-0 right-0 text-red-500 rounded bg-gray-100 cursor-pointer"
+        >
+          X
+        </button>
       </div>
+    ))}
+    {isUploading && <p>Loading...</p>}
+  </div>
+</div>
+</div>
+
+
+
 
 {/* --------------------------------------------------------------------------checkbox section below --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
 <div id='checkboxes'>
@@ -360,8 +387,18 @@ export default function ShopCreation() {
         All
       </label>
       </div>
+      <div className='flex flex-col mt-4'>
+        <label className='text-lg'>Price Per Wash</label>
+      <input
+        className='rounded m-2'
+        type="text"
+        placeholder="$15.00"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+      />
+      </div>
       <button 
-      className="bg-white rounded"
+      className="bg-white rounded mt-4 "
       type="submit">
         Create Shop</button>
     </form>

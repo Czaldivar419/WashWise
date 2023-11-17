@@ -5,7 +5,6 @@ async function createOrder(req, res) {
     const client = await clientPromise;
     const db = client.db("WashwiseMain");
     const { 
-      price,
       orderStatus,
       timeOfOrder,
       typeOfWash,
@@ -15,7 +14,6 @@ async function createOrder(req, res) {
        } = req.body; 
 
     const order = await db.collection("orders").insertOne({
-      price,
       orderStatus,
       timeOfOrder,
       typeOfWash,
