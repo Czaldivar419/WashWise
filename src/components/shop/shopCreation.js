@@ -19,7 +19,6 @@ export default function ShopCreation() {
   
 
   const handleFormSubmit = async (e) => {
-    e.preventDefault();
 
     const session = await getSession(); // Get the user's session
 

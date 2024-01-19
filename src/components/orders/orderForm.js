@@ -102,7 +102,7 @@ useEffect(() => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div>
+      <div className='mb-4'>
       <label htmlFor="typeOfWash">Type of Wash:</label>
       <select
         id="typeOfWash"
@@ -118,7 +118,7 @@ useEffect(() => {
         ))}
       </select>
     </div>
-      <div>
+      <div className='mb-4'>
       <label htmlFor="typeOfDetergents">Type of Detergents:</label>
       <select
         id="typeOfDetergents"
@@ -134,7 +134,7 @@ useEffect(() => {
         ))}
       </select>
     </div>
-      <button type="submit" className="bg-blue-300 px-2 rounded">
+      <button type="submit" className="mb-4 bg-blue-400 px-2 rounded">
         Create Order
       </button>
     </form>

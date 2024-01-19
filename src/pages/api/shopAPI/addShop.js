@@ -11,6 +11,7 @@ async function addShop (req, res) {
         images,
         laundryServices,
         availableBrands,
+        price,
         ownerId, } = req.body;
   
       const post = await db.collection("shops").insertOne({
@@ -20,6 +21,7 @@ async function addShop (req, res) {
           images,
           laundryServices,
           availableBrands,
+          price,
           ownerId,
       });
   
